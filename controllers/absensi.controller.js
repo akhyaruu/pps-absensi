@@ -141,3 +141,74 @@ exports.getByFilter = async (req, res) => {
       });
    }
 };
+
+// menyetujui absensi
+exports.approve = async (req, res) => {
+   try {
+      const {
+         id
+      } = req.params;
+      const {
+         approved_by
+      } = req.body; // ID admin yang approve
+
+      if (!approved_by) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'approved_by wajib diisi (ID admin yang melakukan approve)'
+         });
+      }
+
+      if (!id) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'ID absensi wajib diisi'
+         });
+      }
+
+      // cek apakah data ada
+      const existingData = await absensiModel.findById(id);
+      if (!existingData) {
+         return res.status(404).json({
+            status: 'error',
+            message: 'Data absensi tidak ditemukan'
+         });
+      }
+
+      // cek apakah status masih pending
+      if (existingData.status !== 'pending') {
+         return res.status(400).json({
+            status: 'error',
+            message: `Tidak dapat approve. Status saat ini: ${existingData.status}`
+         });
+      }
+
+      // update status
+      const result = await absensiModel.approve(id, approved_by);
+
+      if (result.affectedRows === 0) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'Gagal mengupdate data'
+         });
+      }
+
+      res.status(200).json({
+         status: 'success',
+         message: 'Absensi berhasil disetujui',
+         data: {
+            id: parseInt(id),
+            old_status: 'pending',
+            new_status: 'approved',
+            approved_by: approved_by,
+            approved_at: new Date()
+         }
+      });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({
+         status: 'error',
+         message: 'Terjadi kesalahan pada server'
+      });
+   }
+};

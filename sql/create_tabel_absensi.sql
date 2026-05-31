@@ -5,7 +5,7 @@ CREATE TABLE absensi (
    photo_url VARCHAR(255) NOT NULL,
    latitude DECIMAL(10,8),
    longitude DECIMAL(11,8),
-   status ENUM('pending','approved','rejected') DEFAULT 'pending',
+   status VARCHAR(25) DEFAULT 'pending',
    rejection_reason VARCHAR(255),
    approved_by VARCHAR(50),
    approved_at DATETIME,

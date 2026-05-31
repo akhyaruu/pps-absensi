@@ -134,3 +134,21 @@ exports.findByFilter = ({
       });
    });
 };
+
+exports.approve = (id, approved_by) => {
+   return new Promise((resolve, reject) => {
+      const query = `
+         UPDATE absensi 
+         SET 
+            status = 'approved',
+            approved_by = ?,
+            approved_at = NOW()
+         WHERE id = ? AND status = 'pending'
+        `;
+
+      db.query(query, [approved_by, id], (err, result) => {
+         if (err) return reject(err);
+         resolve(result);
+      });
+   });
+};
