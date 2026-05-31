@@ -50,3 +50,35 @@ exports.findAll = () => {
       });
    });
 };
+
+exports.findById = (id) => {
+   return new Promise((resolve, reject) => {
+      const query = `
+         SELECT 
+            id, 
+            employee_id, 
+            check_in_time, 
+            photo_url, 
+            latitude, 
+            longitude, 
+            status,
+            rejection_reason,
+            approved_by,
+            approved_at,
+            created_at,
+            updated_at
+         FROM absensi 
+         WHERE id = ?
+        `;
+
+      db.query(query, [id], (err, results) => {
+         if (err) return reject(err);
+
+         if (results.length === 0) {
+            resolve(null);
+         } else {
+            resolve(results[0]);
+         }
+      });
+   });
+};
