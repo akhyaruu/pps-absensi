@@ -3,6 +3,7 @@ const router = express.Router();
 const absensiController = require('../controllers/absensi.controller');
 
 router.get('/', absensiController.getAll);
+router.get('/filter', absensiController.getByFilter);
 router.get('/:id', absensiController.getById);
 router.post('/checkin', absensiController.checkIn);
 

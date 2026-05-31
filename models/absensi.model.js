@@ -82,3 +82,55 @@ exports.findById = (id) => {
       });
    });
 };
+
+exports.findByFilter = ({
+   status,
+   startDate,
+   endDate
+}) => {
+   return new Promise((resolve, reject) => {
+      let query = `
+         SELECT 
+            id, 
+            employee_id, 
+            check_in_time, 
+            photo_url, 
+            latitude, 
+            longitude, 
+            status,
+            rejection_reason,
+            approved_by,
+            approved_at,
+            created_at,
+            updated_at
+         FROM absensi 
+         WHERE 1=1
+        `;
+      const values = [];
+
+      // filter by status
+      if (status) {
+         query += ` AND status = ?`;
+         values.push(status);
+      }
+
+      // filter by startDate
+      if (startDate) {
+         query += ` AND DATE(check_in_time) >= ?`;
+         values.push(startDate);
+      }
+
+      // filter by endDate
+      if (endDate) {
+         query += ` AND DATE(check_in_time) <= ?`;
+         values.push(endDate);
+      }
+
+      query += ` ORDER BY check_in_time DESC`;
+
+      db.query(query, values, (err, results) => {
+         if (err) return reject(err);
+         resolve(results);
+      });
+   });
+};

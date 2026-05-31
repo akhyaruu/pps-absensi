@@ -106,3 +106,38 @@ exports.getById = async (req, res) => {
       });
    }
 };
+
+// mendapatkan data absensi sesuai filter
+exports.getByFilter = async (req, res) => {
+   try {
+      const {
+         status,
+         startDate,
+         endDate
+      } = req.query;
+
+      const data = await absensiModel.findByFilter({
+         status,
+         startDate,
+         endDate
+      });
+
+      res.status(200).json({
+         status: 'success',
+         message: 'Data absensi berhasil diambil',
+         filter: {
+            status: status || 'semua',
+            startDate: startDate || 'tidak dibatasi',
+            endDate: endDate || 'tidak dibatasi'
+         },
+         total: data.length,
+         data: data
+      });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({
+         status: 'error',
+         message: 'Terjadi kesalahan pada server'
+      });
+   }
+};
