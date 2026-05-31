@@ -6,8 +6,9 @@ CREATE TABLE absensi (
    latitude DECIMAL(10,8),
    longitude DECIMAL(11,8),
    status VARCHAR(25) DEFAULT 'pending',
-   rejection_reason VARCHAR(255),
    approved_by VARCHAR(50),
+   rejected_by VARCHAR(50),
+   rejection_reason VARCHAR(255),
    approved_at DATETIME,
    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

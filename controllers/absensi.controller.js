@@ -212,3 +212,83 @@ exports.approve = async (req, res) => {
       });
    }
 };
+
+// menolak absensi
+exports.reject = async (req, res) => {
+   try {
+      const {
+         id
+      } = req.params;
+      const {
+         rejection_reason,
+         rejected_by
+      } = req.body;
+
+      if (!rejected_by) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'rejected_by wajib diisi (ID admin yang melakukan penolakan)'
+         });
+      }
+
+      if (!rejection_reason) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'rejection_reason wajib diisi (alasan penolakan)'
+         });
+      }
+
+      if (!id) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'ID absensi wajib diisi'
+         });
+      }
+
+      // cek apakah data ada
+      const existingData = await absensiModel.findById(id);
+      if (!existingData) {
+         return res.status(404).json({
+            status: 'error',
+            message: 'Data absensi tidak ditemukan'
+         });
+      }
+
+      // cek apakah status masih pending
+      if (existingData.status !== 'pending') {
+         return res.status(400).json({
+            status: 'error',
+            message: `Tidak dapat reject. Status saat ini: ${existingData.status}`
+         });
+      }
+
+      // update status
+      const result = await absensiModel.reject(id, rejection_reason, rejected_by);
+
+      if (result.affectedRows === 0) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'Gagal mengupdate data'
+         });
+      }
+
+      res.status(200).json({
+         status: 'success',
+         message: 'Absensi berhasil ditolak',
+         data: {
+            id: parseInt(id),
+            old_status: 'pending',
+            new_status: 'rejected',
+            rejection_reason: rejection_reason,
+            rejected_by: rejected_by,
+            rejected_at: new Date()
+         }
+      });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({
+         status: 'error',
+         message: 'Terjadi kesalahan pada server'
+      });
+   }
+};

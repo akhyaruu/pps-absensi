@@ -35,8 +35,9 @@ exports.findAll = () => {
             latitude, 
             longitude, 
             status,
-            rejection_reason,
             approved_by,
+            rejected_by,
+            rejection_reason,
             approved_at,
             created_at,
             updated_at
@@ -62,8 +63,9 @@ exports.findById = (id) => {
             latitude, 
             longitude, 
             status,
-            rejection_reason,
             approved_by,
+            rejected_by,
+            rejection_reason,
             approved_at,
             created_at,
             updated_at
@@ -98,8 +100,9 @@ exports.findByFilter = ({
             latitude, 
             longitude, 
             status,
-            rejection_reason,
             approved_by,
+            rejected_by,
+            rejection_reason,
             approved_at,
             created_at,
             updated_at
@@ -147,6 +150,24 @@ exports.approve = (id, approved_by) => {
         `;
 
       db.query(query, [approved_by, id], (err, result) => {
+         if (err) return reject(err);
+         resolve(result);
+      });
+   });
+};
+
+exports.reject = (id, rejection_reason, rejected_by) => {
+   return new Promise((resolve, reject) => {
+      const query = `
+            UPDATE absensi 
+            SET 
+               status = 'rejected',
+               rejection_reason = ?,
+               rejected_by = ?
+            WHERE id = ? AND status = 'pending'
+        `;
+
+      db.query(query, [rejection_reason, rejected_by, id], (err, result) => {
          if (err) return reject(err);
          resolve(result);
       });
