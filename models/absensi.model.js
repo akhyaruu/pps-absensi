@@ -23,3 +23,30 @@ exports.create = (data) => {
       });
    });
 };
+
+exports.findAll = () => {
+   return new Promise((resolve, reject) => {
+      const query = `
+         SELECT 
+            id, 
+            employee_id, 
+            check_in_time, 
+            photo_url, 
+            latitude, 
+            longitude, 
+            status,
+            rejection_reason,
+            approved_by,
+            approved_at,
+            created_at,
+            updated_at
+         FROM absensi 
+         ORDER BY check_in_time DESC
+        `;
+
+      db.query(query, (err, results) => {
+         if (err) return reject(err);
+         resolve(results);
+      });
+   });
+};

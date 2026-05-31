@@ -49,3 +49,23 @@ exports.checkIn = async (req, res) => {
       });
    }
 };
+
+// mendapatkan semua data absensi
+exports.getAll = async (req, res) => {
+   try {
+      const data = await absensiModel.findAll();
+
+      res.status(200).json({
+         status: 'success',
+         message: 'Data absensi berhasil diambil',
+         total: data.length,
+         data: data
+      });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({
+         status: 'error',
+         message: 'Terjadi kesalahan pada server'
+      });
+   }
+};
