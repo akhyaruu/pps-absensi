@@ -9,6 +9,7 @@ router.get('/filter', absensiController.getByFilter);
 router.get('/:id', absensiController.getById);
 router.put('/approve/:id', absensiController.approve);
 router.put('/reject/:id', absensiController.reject);
+router.get('/photo/:attendance_id', absensiController.getPhoto);
 
 router.post('/checkin',  upload.single('photo_url'), handleMulterError, absensiController.checkIn);
 

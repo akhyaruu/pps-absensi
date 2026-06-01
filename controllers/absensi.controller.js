@@ -1,4 +1,6 @@
 const absensiModel = require('../models/absensi.model');
+const path = require('path');
+const fs = require('fs');
 
 // melakukan check-in atau absensi
 exports.checkIn = async (req, res) => {
@@ -305,6 +307,63 @@ exports.reject = async (req, res) => {
             rejected_at: new Date()
          }
       });
+   } catch (error) {
+      console.error(error);
+      res.status(500).json({
+         status: 'error',
+         message: 'Terjadi kesalahan pada server'
+      });
+   }
+};
+
+// mendapatkan bukti foto absensi
+exports.getPhoto = async (req, res) => {
+   try {
+      const {
+         attendance_id
+      } = req.params;
+
+      if (!attendance_id) {
+         return res.status(400).json({
+            status: 'error',
+            message: 'attendance_id wajib diisi'
+         });
+      }
+
+      const attendance = await absensiModel.findById(attendance_id);
+
+      if (!attendance) {
+         return res.status(404).json({
+            status: 'error',
+            message: 'Data absensi tidak ditemukan'
+         });
+      }
+
+      if (!attendance.photo_url) {
+         return res.status(404).json({
+            status: 'error',
+            message: 'Foto bukti absensi tidak tersedia'
+         });
+      }
+
+      // opsi 1: Jika photo_url adalah URL eksternal (redirect)
+      // if (attendance.photo_url.startsWith('http')) {
+      //    return res.redirect(attendance.photo_url);
+      // }
+
+      // opsi 2: Jika photo_url adalah path lokal (send file)
+      const filename = path.basename(attendance.photo_url);
+      const filePath = path.join(__dirname, '../uploads', filename);
+
+      if (!fs.existsSync(filePath)) {
+         return res.status(404).json({
+            status: 'error',
+            message: 'File foto tidak ditemukan di server'
+         });
+      }
+
+      res.sendFile(filePath);
+
    } catch (error) {
       console.error(error);
       res.status(500).json({
